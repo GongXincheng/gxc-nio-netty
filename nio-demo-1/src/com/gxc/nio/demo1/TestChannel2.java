@@ -33,11 +33,7 @@ public class TestChannel2 {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         while(inChannel.read(buffer) != -1) {
             buffer.flip();
-
-            byte[] dst = new byte[buffer.limit()];
-            buffer.get(dst);
-            System.out.println(new String(dst));
-
+            System.out.println(new String(buffer.array(), 0, buffer.limit()));
             buffer.clear();
         }
         inChannel.close();
@@ -49,7 +45,7 @@ public class TestChannel2 {
      */
     @Test
     public void testUseChannelToCopyFile3() throws Exception {
-        FileChannel inChannel = FileChannel.open(Paths.get("/Users/gxc/tmp/head_2.png"), StandardOpenOption.READ);
+        FileChannel inChannel = FileChannel.open(Paths.get("/Users/gxc/tmp/1.png"), StandardOpenOption.READ);
         FileChannel outChannel = FileChannel.open(Paths.get("/Users/gxc/tmp/head_2_1.png"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.READ);
 
         inChannel.transferTo(0, inChannel.size(), outChannel);
@@ -63,17 +59,17 @@ public class TestChannel2 {
      */
     @Test
     public void testUseChannelToCopyFile2() throws Exception {
-//        FileInputStream fis = new FileInputStream("/Users/gxc/tmp/head_2.png");
+//        FileInputStream fis = new FileInputStream("/Users/gxc/tmp/1.png");
 //        FileOutputStream fos = new FileOutputStream("/Users/gxc/tmp/head_2_1.png");
 
         // 方式1，获取Channel
-//        RandomAccessFile fis = new RandomAccessFile("/Users/gxc/tmp/head_2.png", "rw");
+//        RandomAccessFile fis = new RandomAccessFile("/Users/gxc/tmp/1.png", "rw");
 //        RandomAccessFile fos = new RandomAccessFile("/Users/gxc/tmp/head_2_1.png", "rw");
 //        FileChannel inChannel = fis.getChannel();
 //        FileChannel outChannel = fos.getChannel();
 
         // 方式2：获取channel
-        FileChannel inChannel = FileChannel.open(Paths.get("/Users/gxc/tmp/head_2.png"), StandardOpenOption.READ);
+        FileChannel inChannel = FileChannel.open(Paths.get("/Users/gxc/tmp/1.png"), StandardOpenOption.READ);
         FileChannel outChannel = FileChannel.open(Paths.get("/Users/gxc/tmp/head_2_1.png"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.READ);
 
         MappedByteBuffer inBuffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
@@ -96,7 +92,7 @@ public class TestChannel2 {
      */
     @Test
     public void testUseChannelToCopyFile() throws Exception {
-        FileInputStream fis = new FileInputStream("/Users/gxc/tmp/head_2.png");
+        FileInputStream fis = new FileInputStream("/Users/gxc/tmp/1.png");
         FileOutputStream fos = new FileOutputStream("/Users/gxc/tmp/head_2_1.png");
 
         // 获取Channel
