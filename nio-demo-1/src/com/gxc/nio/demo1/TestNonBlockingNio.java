@@ -63,14 +63,15 @@ public class TestNonBlockingNio {
                 // 8：获取准备"就绪"的事件
                 SelectionKey selectionKey = iterator.next();
                 // 9：判断具体是哪种事件类型
-                if(selectionKey.isAcceptable()) {
+                if (selectionKey.isAcceptable()) {
                     // 10：若接收事件"就绪"，获取客户端连接
                     SocketChannel sChannel = serverSocketChannel.accept();
                     // 11：将客户端通道切换成非阻塞模式
                     sChannel.configureBlocking(false);
                     // 12：将该 客户端通道 注册到Selector上，监听"读就绪"状态
                     sChannel.register(selector, SelectionKey.OP_READ);
-                } else if (selectionKey.isReadable()) {
+                }
+                if (selectionKey.isReadable()) {
                     // 13：获取当前Selector上"读就绪"的通道
                     SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
                     // 14：读取数据
