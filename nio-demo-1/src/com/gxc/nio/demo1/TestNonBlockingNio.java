@@ -10,6 +10,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.Scanner;
 
 /**
  * 非阻塞式NIO网络通讯
@@ -21,6 +22,8 @@ public class TestNonBlockingNio {
 
     @Test
     public void client() throws Exception {
+        Scanner sc = new Scanner(System.in);
+
         // 1：获取Socket通道
         SocketChannel sChannel = SocketChannel.open(
                 new InetSocketAddress("127.0.0.1", 10000));
@@ -31,11 +34,16 @@ public class TestNonBlockingNio {
         // 3：分配指定大小的缓冲区
         ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-        // 4：发送数据给服务端
-        buffer.put((LocalDateTime.now().toString() + "\n" + "Hello World").getBytes());
-        buffer.flip();
-        sChannel.write(buffer);
-        buffer.clear();
+        String message;
+        do {
+            message = LocalDateTime.now().toString() + "\n" + sc.next();
+            // 4：发送数据给服务端
+            buffer.put(message.getBytes());
+            buffer.flip();
+            sChannel.write(buffer);
+            buffer.clear();
+        } while(!message.contains("886"));
+
         // 5：关闭通道
         sChannel.close();
     }
@@ -57,6 +65,7 @@ public class TestNonBlockingNio {
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         // 6：轮询式的获取选择器上已经"准备就绪"的事件
         while (selector.select() > 0) {
+            System.out.println("test blocking ...");
             // 7：获取当前selector中所有注册的"选择键（已就绪的监听事件）"
             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
             while (iterator.hasNext()) {
