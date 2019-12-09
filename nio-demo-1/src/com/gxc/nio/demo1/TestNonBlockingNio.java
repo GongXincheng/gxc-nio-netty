@@ -76,9 +76,10 @@ public class TestNonBlockingNio {
                     SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
                     // 14：读取数据
                     ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    while (socketChannel.read(buffer) != -1) {
+                    while (socketChannel.read(buffer) > 0) {
                         buffer.flip();
-                        System.out.println(new String(buffer.array(), 0, buffer.limit()));
+                        String message = new String(buffer.array(), 0, buffer.limit());
+                        System.out.println(message);    // message == null || message.trim().length() == 0
                         buffer.clear();
                     }
                 }
