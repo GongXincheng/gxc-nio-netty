@@ -1,4 +1,4 @@
-package com.gxc.rpc;
+package com.gxc.rpc.service;
 
 import it.chusen.socket.biorpc.BioRpcResponse;
 

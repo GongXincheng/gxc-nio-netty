@@ -14,7 +14,7 @@ import java.util.Scanner;
  * @author GongXincheng
  * @date 2019-12-09 17:03
  */
-public class Main {
+public class MyClient {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);

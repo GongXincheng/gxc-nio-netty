@@ -1,4 +1,4 @@
-package com.gxc.rpc.req;
+package it.chusen.socket.biorpc;
 
 import java.io.Serializable;
 import java.util.Objects;

@@ -1,4 +1,8 @@
-package it.chusen.socket.biorpc;
+package com.gxc.rpc.util;
+
+
+import it.chusen.socket.biorpc.BioRpcRequest;
+import it.chusen.socket.biorpc.BioRpcResponse;
 
 import java.io.*;
 
@@ -21,6 +25,13 @@ public class SerializeUtil {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(bioRpcResponse);
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public static byte[] requestToByteArray(BioRpcRequest request) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(request);
         return byteArrayOutputStream.toByteArray();
     }
 }

@@ -1,4 +1,9 @@
-package it.chusen.socket.biorpc;
+package com.gxc.rpc;
+
+import com.gxc.rpc.service.UserService;
+import com.gxc.rpc.util.SerializeUtil;
+import it.chusen.socket.biorpc.BioRpcRequest;
+import it.chusen.socket.biorpc.BioRpcResponse;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -22,6 +27,7 @@ public class MyServer {
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
                 byte[] buf = new byte[1024];
                 int length = 0;
                 while ((length = inputStream.read(buf)) != -1) {
