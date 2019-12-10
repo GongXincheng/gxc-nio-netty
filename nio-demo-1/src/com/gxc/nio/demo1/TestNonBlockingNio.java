@@ -65,7 +65,7 @@ public class TestNonBlockingNio {
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         // 6：轮询式的获取选择器上已经"准备就绪"的事件
         while (selector.select() > 0) {
-            System.out.println("test blocking ...");
+            //System.out.println("test blocking ...");
             // 7：获取当前selector中所有注册的"选择键（已就绪的监听事件）"
             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
             while (iterator.hasNext()) {
@@ -78,7 +78,7 @@ public class TestNonBlockingNio {
                     // 11：将客户端通道切换成非阻塞模式
                     sChannel.configureBlocking(false);
                     // 12：将该 客户端通道 注册到Selector上，监听"读就绪"状态
-                    sChannel.register(selector, SelectionKey.OP_READ);
+                    sChannel.register(selectionKey.selector(), SelectionKey.OP_READ);
                 }
                 if (selectionKey.isReadable()) {
                     // 13：获取当前Selector上"读就绪"的通道
