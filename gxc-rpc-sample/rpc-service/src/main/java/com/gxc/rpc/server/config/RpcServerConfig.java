@@ -1,6 +1,7 @@
 package com.gxc.rpc.server.config;
 
 import com.gxc.rpc.server.BioRpcServer;
+import com.gxc.rpc.server.NioRpcServer;
 import com.gxc.rpc.server.registry.ServiceRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,9 +18,14 @@ public class RpcServerConfig {
     /**
      * BIO的RPC服务端
      */
-    @Bean
+    //@Bean
     public BioRpcServer bioRpcServer() {
         return new BioRpcServer(9000);
+    }
+
+    @Bean
+    public NioRpcServer nioRpcServer() {
+        return new NioRpcServer(9000);
     }
 
     /**

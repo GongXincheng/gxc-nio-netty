@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 /**
+ * 客户端.
+ *
  * @author GongXincheng
  * @date 2019-12-10 12:54
  */
@@ -16,29 +18,46 @@ public class MyClient {
 
     private static final int DEFAULT_BUFFER_SIZE = 1024;
 
+    private Selector selector;
+
+    private SocketChannel socketChannel;
+
+
     public static void main(String[] args) throws Exception {
-        Scanner sc = new Scanner(System.in);
+        MyClient client = new MyClient();
+        client.init("127.0.0.1", 10001);
+        client.listener();
+        client.sendMessage();
+    }
 
-        SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("127.0.0.1", 10001));
+    /**
+     * 初始化 客户端通道
+     *
+     * @param host 服务端i
+     * @param port 端口号
+     */
+    private void init(String host, int port) throws Exception {
+        socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
         socketChannel.configureBlocking(false);
-        Selector selector = Selector.open();
+        selector = Selector.open();
         socketChannel.register(selector, SelectionKey.OP_READ);
-        ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+    }
 
+    /**
+     * 客户端通道监听.
+     */
+    private void listener() {
         // 开启一个线程监听 事件
         new Thread(new ListenerHandler(selector)).start();
+    }
 
+    private void sendMessage() throws Exception {
+        Scanner sc = new Scanner(System.in);
         // 发送数据
         while (sc.hasNext()) {
             String message = sc.next();
-
-            buffer.put(message.getBytes());
-            buffer.flip();
-            socketChannel.write(buffer);
-            buffer.clear();
+            socketChannel.write(ByteBuffer.wrap(message.getBytes()));
         }
-
-
     }
 
     /**

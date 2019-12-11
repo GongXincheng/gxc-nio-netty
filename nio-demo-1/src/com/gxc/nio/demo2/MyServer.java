@@ -86,6 +86,13 @@ public class MyServer {
                                 buffer.clear();
                             }
 
+                            // TODO：必须加上此句，表示客户端关闭！否则会出现客户端无线读就绪循环
+                            if (message.trim().length() == 0) {
+                                channelMap.remove(socketChannel);
+                                selectionKey.cancel();
+                                break;
+                            }
+
                             // TODO：服务端接收到消息后，处理消息，并返回数据
                             // 获取该通道的名称
                             String channelName = channelMap.get(socketChannel);

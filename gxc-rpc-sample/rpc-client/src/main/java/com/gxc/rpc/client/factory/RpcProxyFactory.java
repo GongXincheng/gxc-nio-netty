@@ -1,6 +1,7 @@
 package com.gxc.rpc.client.factory;
 
 import com.gxc.rpc.client.BioRpcClient;
+import com.gxc.rpc.client.NioRpcClient;
 import com.gxc.rpc.client.interfaces.RpcClient;
 import com.gxc.rpc.req.RpcRequest;
 import com.gxc.rpc.vo.RpcResponse;
@@ -58,7 +59,10 @@ public class RpcProxyFactory<T> implements InvocationHandler {
 
         try {
             // 发起网络请求,并接收响应
-            RpcClient client = new BioRpcClient("127.0.0.1", 9000);
+            //RpcClient client = new BioRpcClient("127.0.0.1", 9000);
+            RpcClient client = new NioRpcClient("127.0.0.1", 9000);
+
+
             RpcResponse response = client.sendRequest(request);
             // 解析并返回
             if (response.getStatus() == 1) {
