@@ -22,7 +22,9 @@ public class MyClient {
 
     private SocketChannel socketChannel;
 
-
+    /**
+     * 客户端启动.
+     */
     public static void main(String[] args) throws Exception {
         MyClient client = new MyClient();
         client.init("127.0.0.1", 10001);
@@ -66,6 +68,7 @@ public class MyClient {
     private static class ListenerHandler implements Runnable {
 
         private Selector selector;
+
         ListenerHandler(Selector selector) {
             this.selector = selector;
         }
