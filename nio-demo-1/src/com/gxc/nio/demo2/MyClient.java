@@ -27,7 +27,8 @@ public class MyClient {
      */
     public static void main(String[] args) throws Exception {
         MyClient client = new MyClient();
-        client.init("127.0.0.1", 10001);
+        //client.init("127.0.0.1", 10001);
+        client.init("192.168.14.101", 1234);
         client.listener();
         client.sendMessage();
     }
