@@ -16,3 +16,9 @@ gxc-rpc-sample
     |-- rpc-client
         |-- com.gxc.rpc.client.RpcClientTestWithSpring 客户端单元测试
 ```
+#### 3：实现简易的SpringMVC（自带服务器NIO方式）
+``` 
+nio-spring-mvc
+    |-- com.gxc.spring
+        |- Main 启动类
+```
