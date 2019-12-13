@@ -1,1 +1,1 @@
-### 实现简易的SpringMVC（自带服务端）可接受HTTP请求
+### 实现简易的SpringMVC，使用NIO接收HTTP请求
