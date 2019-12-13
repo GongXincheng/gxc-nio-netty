@@ -1,6 +1,12 @@
 package com.gxc.spring.component.server;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gxc.spring.component.context.AbstractApplicationContext;
+import com.gxc.spring.component.model.RequestDTO;
+import com.gxc.spring.component.util.HttpParseUtil;
+import com.gxc.spring.model.constant.HttpHeaders;
+import com.gxc.spring.model.constant.MediaType;
+import com.gxc.spring.model.constant.StringConstant;
 import com.gxc.spring.model.constant.WebConfigConstant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +58,7 @@ public class NioServerApplicationContext extends AbstractApplicationContext {
             // 监听客户端通道
             listener(selector);
 
-            log.info("|-- Application Server starting Success ！");
+            log.info("|-- Application Server starting Success ！{}", StringConstant.SEPARATOR);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -98,7 +104,7 @@ public class NioServerApplicationContext extends AbstractApplicationContext {
 
         @Override
         public void run() {
-            log.info("|-- Start run nio server request listener ...");
+            log.info("|-- Start run nio server request listener ...{}", StringConstant.SEPARATOR);
 
             while (!shutdown) {
                 try {
@@ -114,26 +120,30 @@ public class NioServerApplicationContext extends AbstractApplicationContext {
                         // 读就绪
                         if (selectionKey.isReadable()) {
                             SocketChannel client = (SocketChannel) selectionKey.channel();
+                            try {
+                                // TODO 读取数据
+                                String request = readReadyHandler(client);
+                                if (StringUtils.isBlank(request)) {
+                                    // 关闭此链接
+                                    log.info("|-- Has a connection closed：{}", client.getRemoteAddress());
+                                    selectionKey.cancel();
+                                } else {
+                                    // TODO：解析并处理请求.
+                                    Object result = handlerRequest(request);
 
-                            // TODO 读取数据
-                            String request = readReadyHandler(client);
-                            if (StringUtils.isBlank(request)) {
-                                // 关闭此链接
-                                log.info("|-- Has a connection closed：{}", client.getRemoteAddress());
-                                selectionKey.cancel();
-                                break;
-                            } else {
-                                System.out.println(request);
+                                    // TODO：返回数据给客户端
+                                    responseMessage(client, result);
 
-                                //TODO 处理并返回数据给客户端
-                                responseMessage(client);
-
-                                // TODO：必须关闭连接，才能将内容响应到HTTP客户端
-                                // TODO：如果客户端不是HTTP协议，则无需关闭.
+                                    // TODO：必须关闭连接，才能将内容响应到HTTP客户端，如果客户端不是HTTP协议，则无需关闭.
+                                    client.close();
+                                }
+                            } catch (Exception e) {
+                                log.error("|--> deal client request has error: {}", e.getMessage(), e);
                                 client.close();
+                                log.warn("|--> Because of exception, close client connection ！");
                             }
-                        }
-                    }
+                        } //selectionKey.isReadable()
+                    } //it.hasNext()
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -145,6 +155,22 @@ public class NioServerApplicationContext extends AbstractApplicationContext {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        /**
+         * 解析并处理请求.
+         *
+         * @param request requestMessage
+         * @return result
+         */
+        private Object handlerRequest(String request) {
+            // 解析 Http Body
+            RequestDTO parse = HttpParseUtil.parse(request);
+
+            // 匹配合适的处理器 并处理
+            System.out.println(JSONObject.toJSONString(parse));
+
+            return JSONObject.toJSONString(parse);
         }
 
         /**
@@ -175,15 +201,17 @@ public class NioServerApplicationContext extends AbstractApplicationContext {
         /**
          * 相应数据给客户端.
          */
-        private void responseMessage(SocketChannel client) throws Exception {
-            String property = System.getProperty("line.separator");
+        private void responseMessage(SocketChannel client, Object result) throws Exception {
             StringBuilder sb = new StringBuilder();
-            sb.append("HTTP/1.1 200 OK").append(property);
-            sb.append(property);
-            sb.append("Success");
+            sb.append("HTTP/1.1 200 OK").append(StringConstant.SEPARATOR_R_N);
+            sb.append(HttpHeaders.CONTENT_TYPE + ": " + MediaType.APPLICATION_JSON_UTF8_VALUE).append(StringConstant.SEPARATOR_R_N);
+            sb.append(StringConstant.SEPARATOR_R_N);
+            sb.append(result);
 
-            System.out.println("response: " + sb.toString());
+            log.warn("response body: {}", sb.toString());
+
             client.write(ByteBuffer.wrap(sb.toString().getBytes()));
+
             log.info("|-- Request response Success：{}", client.getRemoteAddress());
         }
     }

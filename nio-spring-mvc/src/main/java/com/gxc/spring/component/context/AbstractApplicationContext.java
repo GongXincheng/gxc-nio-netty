@@ -4,6 +4,7 @@ import com.gxc.spring.annotation.Bean;
 import com.gxc.spring.annotation.Configuration;
 import com.gxc.spring.annotation.Controller;
 import com.gxc.spring.annotation.Resource;
+import com.gxc.spring.model.constant.StringConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -36,6 +37,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             }
 
             // 装配Bean
+            log.info("configuration bean -> {}{}", config.getSimpleName(), StringConstant.SEPARATOR);
             registryBean(config);
 
             // 注入Bean
@@ -43,7 +45,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
             // 启动服务
             start();
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             // 关闭容器
@@ -59,6 +60,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      * Bean注入
      */
     private void autowireBean() {
+        log.info("|-------- start to autowired bean --------");
         // Controller层注入
         CONTROLLER_BEAN_MAP.forEach((beanName, bean) ->
                 setBeanField(bean)
@@ -68,6 +70,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         BEAN_MAP.forEach((beanName, bean) ->
                 setBeanField(bean)
         );
+        log.info("|-------- all bean has autowired success !{}", StringConstant.SEPARATOR);
     }
 
     /**
@@ -89,6 +92,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                 Object object = getBean(fieldName);
                 try {
                     field.set(bean, object);
+                    log.info("|-- autowired bean：{}，field：{}", bean.getClass().getSimpleName(), fieldName);
                 } catch (IllegalAccessException e) {
                     log.error("|-- Autowire bean has error in class:" + clazz.getName() + "，Field：" + fieldName);
                 }
@@ -102,7 +106,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      * @param config 配置类
      */
     private void registryBean(Class<?> config) throws Exception {
-        log.info("|-------- start to registry bean, configuration bean -> {}", config.getSimpleName());
+        log.info("|-------- start to registry bean --------");
         Object configBean = config.newInstance();
         // 获取配置类中所有的方法.
         Method[] methods = config.getDeclaredMethods();
@@ -122,7 +126,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
                 log.info("|-- registry bean：{} success !", invoke.getClass().getSimpleName());
             }
         }
-        log.info("|-------- all bean has registry success !");
+        log.info("|-------- all bean has registry success ! {}", StringConstant.SEPARATOR);
     }
 
     @Override
