@@ -1,6 +1,6 @@
 package com.gxc.spring.component.util;
 
-import com.gxc.spring.component.model.RequestDTO;
+import com.gxc.spring.component.model.HttpRequestAttribute;
 import com.gxc.spring.model.constant.StringConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,11 +22,15 @@ public class HttpParseUtil {
      * 解析请求消息头和请求消息体
      *
      * @param message 请求内容字符串
-     * @return RequestDTO
+     * @return HttpRequestAttribute
      */
-    public static RequestDTO parse(String message) {
+    public static HttpRequestAttribute parse(String message) {
+        System.out.println("//////////////");
+        System.out.println(message);
+        System.out.println("//////////////");
+
         log.info("|-----------> start parse http body");
-        RequestDTO request = new RequestDTO();
+        HttpRequestAttribute request = new HttpRequestAttribute();
 
         // 先根据换行符进行分割
         String[] afterSeparator = message.split(StringConstant.SEPARATOR_R_N);
@@ -54,9 +58,12 @@ public class HttpParseUtil {
             }
         }
 
-        String[] bodyArr = Arrays.copyOfRange(afterSeparator, nullLine + 1, afterSeparator.length);
-        String body = String.join(StringConstant.SEPARATOR, bodyArr);
-        request.setBody(body);
+        // GET请求的时候如果请求体为空，则nullLine = 0
+        if (nullLine != 0) {
+            String[] bodyArr = Arrays.copyOfRange(afterSeparator, nullLine + 1, afterSeparator.length);
+            String body = String.join(StringConstant.SEPARATOR, bodyArr);
+            request.setBody(body);
+        }
         request.setHeaders(headers);
 
         log.info("|----------- finish parse http body success !");

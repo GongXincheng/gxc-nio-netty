@@ -2,7 +2,9 @@ package com.gxc.spring.component.server;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gxc.spring.component.context.AbstractApplicationContext;
-import com.gxc.spring.component.model.RequestDTO;
+import com.gxc.spring.component.model.HttpRequestAttribute;
+import com.gxc.spring.component.mvc.handler.RequestHandler;
+import com.gxc.spring.component.mvc.handler.RequestHandlerFactory;
 import com.gxc.spring.component.util.HttpParseUtil;
 import com.gxc.spring.model.constant.HttpHeaders;
 import com.gxc.spring.model.constant.MediaType;
@@ -160,17 +162,20 @@ public class NioServerApplicationContext extends AbstractApplicationContext {
         /**
          * 解析并处理请求.
          *
-         * @param request requestMessage
+         * @param requestMessage requestMessage
          * @return result
          */
-        private Object handlerRequest(String request) {
+        private Object handlerRequest(String requestMessage) throws Exception {
             // 解析 Http Body
-            RequestDTO parse = HttpParseUtil.parse(request);
+            HttpRequestAttribute request = HttpParseUtil.parse(requestMessage);
+
+            RequestHandler handler = RequestHandlerFactory.getHandler(request.getMethod());
+
+            Object result = handler.doService(request);
 
             // 匹配合适的处理器 并处理
-            System.out.println(JSONObject.toJSONString(parse));
-
-            return JSONObject.toJSONString(parse);
+            log.info("response body：{}", JSONObject.toJSONString(result));
+            return JSONObject.toJSONString(result);
         }
 
         /**

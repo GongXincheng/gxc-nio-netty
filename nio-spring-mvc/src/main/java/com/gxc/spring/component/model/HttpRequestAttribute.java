@@ -11,7 +11,7 @@ import java.util.Map;
  * @date 2019-12-13 10:42
  */
 @Data
-public class RequestDTO {
+public class HttpRequestAttribute {
 
     private String method;
     private String uri;

@@ -22,8 +22,8 @@ import java.util.Objects;
 @Slf4j
 public abstract class AbstractApplicationContext implements ApplicationContext {
 
-    private static final Map<String, Object> BEAN_MAP = new HashMap<>(16);
-    private static final Map<String, Object> CONTROLLER_BEAN_MAP = new HashMap<>(16);
+    private static final HashMap<String, Object> BEAN_MAP = new HashMap<>(16);
+    private static final HashMap<String, Object> CONTROLLER_BEAN_MAP = new HashMap<>(16);
 
     /**
      * 构造启动.
@@ -154,6 +154,15 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     public void close() throws Exception {
         BEAN_MAP.clear();
         CONTROLLER_BEAN_MAP.clear();
+    }
+
+    /**
+     * 获取所有的Controller.
+     *
+     * @return Map<String, Object>
+     */
+    public static Map<String, Object> getControllerMap() {
+        return (Map<String, Object>) CONTROLLER_BEAN_MAP.clone();
     }
 
     /**
