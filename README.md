@@ -8,6 +8,14 @@ nio-demo-1
         |-- MyServer 服务端启动
 ```
 
+#### 1.1：使用NIO完成聊天室（升级版）
+```
+nio-demo-1
+    |-- com.gxc.nio
+        |-- GroupChatServer 服务端
+        |-- GroupChatClient 客户端
+```
+
 #### 2：使用BIO完成简单RPC框架(整合Spring)
 ```
 gxc-rpc-sample
