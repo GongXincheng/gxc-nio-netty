@@ -74,6 +74,10 @@ public class GroupChatClient {
                             info.append(new String(buffer.array(), 0, buffer.limit()));
                             buffer.clear();
                         }
+                        // 为了防止无线循环
+                        if (info.toString().length() == 0) {
+                            selectionKey.cancel();
+                        }
                         System.out.println(info.toString());
                     }
                 }

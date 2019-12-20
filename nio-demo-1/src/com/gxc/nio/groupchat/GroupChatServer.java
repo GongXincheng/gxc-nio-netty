@@ -49,9 +49,11 @@ public class GroupChatServer {
     /**
      * 通道时间监听
      */
-    public void listener() {
-        try {
-            while (selector.select() > 0) {
+    private void listener() throws Exception {
+
+        while (selector.select() > 0) {
+            try {
+                // TODO：可否在此处单独使用一个线程完成?
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey selectionKey = iterator.next();
@@ -78,18 +80,18 @@ public class GroupChatServer {
                         readData(selectionKey);
                     }
                 }
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // 发生异常处理
-            try {
-                serverChannel.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                // 发生异常处理
+                try {
+                    serverChannel.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
     }
 
     /**
@@ -160,7 +162,7 @@ public class GroupChatServer {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         GroupChatServer server = new GroupChatServer();
         server.listener();
     }
