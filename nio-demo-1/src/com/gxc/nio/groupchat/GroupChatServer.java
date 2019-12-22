@@ -9,6 +9,8 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 群聊服务端
@@ -22,6 +24,7 @@ public class GroupChatServer {
     private static final int DEFAULT_BUFFER_SIZE = 1024;
     private Selector selector;
     private ServerSocketChannel serverChannel;
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /**
      * 构造器，初始化工作
@@ -77,17 +80,27 @@ public class GroupChatServer {
                     // "读就绪"事件
                     if (selectionKey.isReadable()) {
                         // 处理读取的内容
-                        readData(selectionKey);
+                        //readData(selectionKey);
+
+                        Boolean result = threadPool.submit(() -> {
+                            // 处理读取的内容
+                            readData(selectionKey);
+                            return true;
+                        }).get();
+                        if (result) {
+                            // 内容处理完成
+                            System.out.println("将消息返回成功");
+                        }
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
                 // 发生异常处理
                 try {
                     serverChannel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    threadPool.shutdownNow();
+                } catch (IOException io) {
+                    io.printStackTrace();
                 }
             }
         }
