@@ -81,16 +81,21 @@ public class GroupChatServer {
                     if (selectionKey.isReadable()) {
                         // 处理读取的内容
                         //readData(selectionKey);
+//
+//                        Boolean result = threadPool.submit(() -> {
+//                            // 处理读取的内容
+//                            readData(selectionKey);
+//                            return true;
+//                        }).get();
+//                        if (result) {
+//                            // 内容处理完成
+//                            System.out.println("将消息返回成功");
+//                        }
 
-                        Boolean result = threadPool.submit(() -> {
+                        threadPool.execute(() -> {
                             // 处理读取的内容
                             readData(selectionKey);
-                            return true;
-                        }).get();
-                        if (result) {
-                            // 内容处理完成
-                            System.out.println("将消息返回成功");
-                        }
+                        });
                     }
                 }
             } catch (Exception e) {
