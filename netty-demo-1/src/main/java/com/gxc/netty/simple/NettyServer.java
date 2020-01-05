@@ -3,6 +3,7 @@ package com.gxc.netty.simple;
 import com.gxc.netty.simple.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -10,11 +11,16 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author GongXincheng
  * @date 2019-12-22 20:22
  */
 public class NettyServer {
+
+    private static List<SocketChannel> clientSocketChannelList = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
 
@@ -48,14 +54,32 @@ public class NettyServer {
                          */
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
+                            System.out.println("|--> initChannel()：客户端 SocketChannel hashCode = " + ch.hashCode());
+
+                            //TODO 可以使用一个集合管理 SocketChannel，在推送消息时可以将业务加入到各个 Channel
+                            // 对应的 NioEventLoop 的 TaskQueue 或 ScheduleTaskQueue 中
+                            clientSocketChannelList.add(ch);
+
                             // 想管道的最后增加一个处理器
-                            ch.pipeline().addLast(new NettyServerHandler());
+                            ch.pipeline().addLast(new NettyServerHandler(clientSocketChannelList));
                         }
                     });
 
             // 启动服务器并且绑定端口号，并且同步，生成一个 ChannelFuture 对象
             ChannelFuture channelFuture = bootstrap.bind(6668).sync();
-            System.out.println("|-- Server is ready！ --|");
+
+            // TODO：（FutureListener机制） 注册监听器，监控关心的事件（）
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (future.isSuccess()) {
+                        System.out.println("|-- Server is ready！port：6668 --|");
+                    } else {
+                        System.out.println("|-- Server 启动失败 --|");
+                    }
+                }
+            });
+
 
             // 对关闭通道进行监听
             channelFuture.channel().closeFuture().sync();

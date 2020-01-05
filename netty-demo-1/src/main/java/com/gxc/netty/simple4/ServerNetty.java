@@ -15,6 +15,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Netty Server.
  *
@@ -60,24 +62,6 @@ class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("接收到客户端消息：" + ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
-
-        // 任务队列
-        // 1：用户程序自定义的普通任务
-        // 通过ChannelHandlerContext获取PipeLine然后获取Channel，再通过Channel获取NioEventLoop为taskQueue队列添加任务
-        ctx.pipeline().channel().eventLoop().execute(() -> {
-            try {
-                long sleepTime = 1000L;
-                Thread.sleep(sleepTime);
-                ctx.writeAndFlush(Unpooled.copiedBuffer("我睡醒了！[" + sleepTime + "]ms", CharsetUtil.UTF_8));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        // 2：用户自定义定时任务
-        // 3：非当前Reactor线程调用Channel的各种方法
-
-
     }
 
     @Override
