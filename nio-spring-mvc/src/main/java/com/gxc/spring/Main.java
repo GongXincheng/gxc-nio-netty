@@ -3,6 +3,8 @@ package com.gxc.spring;
 import com.gxc.spring.component.context.AnnotationConfigServerApplicationContext;
 import com.gxc.spring.component.context.ApplicationContext;
 import com.gxc.spring.config.GxcConfigurationBean;
+import com.gxc.spring.controller.UserController;
+import com.gxc.spring.model.entity.User;
 
 /**
  * @author GongXincheng
@@ -13,11 +15,11 @@ public class Main {
     public static void main(String[] args) throws Exception {
         ApplicationContext context = new AnnotationConfigServerApplicationContext(GxcConfigurationBean.class);
 
-//        UserController userController = context.getBean("userController", UserController.class);
-//        User user = userController.findById(1);
-//        System.out.println(user);
+        UserController userController = context.getBean("userController", UserController.class);
+        User user = userController.findById(1);
+        System.out.println(user);
 
-        //context.close();
+//        context.close();
     }
 
 }

@@ -24,29 +24,30 @@ import java.net.InetSocketAddress;
  * @date 2020-01-13 08:47
  */
 @Slf4j
-public class GroupChatsServer {
+public class GroupChatServer {
 
     /**
      * 端口号
      */
     private int port;
 
-    public GroupChatsServer(int port) {
+    private GroupChatServer(int port) {
         this.port = port;
     }
 
     /**
      * run方法处理客户请求
      */
-    public void run() throws Exception {
+    private void run() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup(8);
 
         try {
+            // 自定义ChannelHandler
+            final GroupChatServerHandler groupChatServerHandler = new GroupChatServerHandler();
 
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-
-            serverBootstrap.group(bossGroup, workerGroup)
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(new InetSocketAddress("127.0.0.1", port))
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -55,19 +56,19 @@ public class GroupChatsServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            // 获取pipeLine
+                            // 获取 pipeLine
                             ChannelPipeline pipeline = ch.pipeline();
-                            // 向pipeLine中加入解码器
+                            // 向 pipeLine 中加入[解码器]
                             pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
-                            // 向pipeLine中加入编解码器
+                            // 向 pipeLine 中加入[编码器]
                             pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
 
                             // 加入自己的业务处理Handler
-                            pipeline.addLast(null);
+                            pipeline.addLast(groupChatServerHandler);
                         }
                     });
 
-            ChannelFuture channelFuture = serverBootstrap.bind().sync();
+            ChannelFuture channelFuture = bootstrap.bind().sync();
             channelFuture.addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     log.info("聊天室服务端启动：{}", future.channel().localAddress());
@@ -85,7 +86,7 @@ public class GroupChatsServer {
     }
 
     public static void main(String[] args) throws Exception {
-        GroupChatsServer server = new GroupChatsServer(9090);
+        GroupChatServer server = new GroupChatServer(9090);
         server.run();
     }
 
