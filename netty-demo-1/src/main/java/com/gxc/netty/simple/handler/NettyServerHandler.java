@@ -58,7 +58,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         for (SocketChannel socketChannel : clientChannelList) {
             // 排除自身
             if (socketChannel == ctx.channel()) {
-                break;
+                continue;
             }
             socketChannel.eventLoop().execute(() -> {
                 String message = String.format("我是%s：%s", ctx.channel().remoteAddress(), "发送给其他Client通道");
