@@ -1,6 +1,5 @@
 package com.gxc.netty.simple;
 
-import com.gxc.netty.simple.handler.NettyClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

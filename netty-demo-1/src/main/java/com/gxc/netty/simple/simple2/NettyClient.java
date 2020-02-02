@@ -1,4 +1,4 @@
-package com.gxc.netty.simple2;
+package com.gxc.netty.simple.simple2;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -12,8 +12,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.CharsetUtil;
-
-import java.util.Date;
 
 /**
  * @author GongXincheng

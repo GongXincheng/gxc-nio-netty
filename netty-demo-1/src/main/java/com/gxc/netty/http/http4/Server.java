@@ -1,4 +1,4 @@
-package com.gxc.netty.http4;
+package com.gxc.netty.http.http4;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;

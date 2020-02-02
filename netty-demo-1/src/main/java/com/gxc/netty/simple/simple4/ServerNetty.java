@@ -1,4 +1,4 @@
-package com.gxc.netty.simple4;
+package com.gxc.netty.simple.simple4;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -14,8 +14,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Netty Server.

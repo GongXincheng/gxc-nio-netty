@@ -1,4 +1,4 @@
-package com.gxc.netty.simple5;
+package com.gxc.netty.simple.simple5;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;

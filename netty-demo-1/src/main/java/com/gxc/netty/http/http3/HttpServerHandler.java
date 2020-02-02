@@ -1,4 +1,4 @@
-package com.gxc.netty.http3;
+package com.gxc.netty.http.http3;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
