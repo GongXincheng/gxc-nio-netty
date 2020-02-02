@@ -1,4 +1,4 @@
-package com.gxc.netty.chat;
+package com.gxc.netty.groupchat;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

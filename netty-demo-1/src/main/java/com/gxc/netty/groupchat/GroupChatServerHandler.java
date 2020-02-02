@@ -1,4 +1,4 @@
-package com.gxc.netty.chat;
+package com.gxc.netty.groupchat;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
