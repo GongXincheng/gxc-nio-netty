@@ -21,8 +21,8 @@ public class ServiceRegistry implements ApplicationContextAware {
 
     private static final Map<String, Object> REGISTERED_SERVICES = new HashMap<>();
 
-    public static <T> T getService(String className) {
-        return (T) REGISTERED_SERVICES.get(className);
+    public static Object getService(String className) {
+        return REGISTERED_SERVICES.get(className);
     }
 
     public static void registerService(Class<?> interfaceClass, Class<?> implClass) {

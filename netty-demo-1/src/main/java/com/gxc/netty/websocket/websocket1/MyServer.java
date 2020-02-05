@@ -1,17 +1,20 @@
-package com.gxc.netty.websocket;
+package com.gxc.netty.websocket.websocket1;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -19,12 +22,14 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
- * WebSocket测试
+ * Web Socket。
  *
  * @author GongXincheng
- * @date 2020-02-02 18:03
+ * @date 2020-02-05 13:39
  */
 @Slf4j
 public class MyServer {
@@ -35,54 +40,37 @@ public class MyServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup(8);
 
         try {
+
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(new InetSocketAddress(9090))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    // 在 bossGroup 中添加一个日志处理器
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ChannelPipeline pipeline = ch.pipeline();
 
-                            // 因为是基于Http协议，使用 Http 的编码和解码器
                             pipeline.addLast(new HttpServerCodec());
 
-                            // 是以块方式写，添加 ChunkedWrite 处理器
                             pipeline.addLast(new ChunkedWriteHandler());
 
-                            /*
-                               说明：
-                                 1：Http 数据在传输过程中是分段，HttpObjectAggregator 就是将多个段聚合起来
-                                 2：这就是为什么当浏览器发送大量数据时，就会发生多次http请求
-                             */
-                            pipeline.addLast(new HttpObjectAggregator(8192));
+                            pipeline.addLast(new HttpObjectAggregator(1024 * 1024));
 
-                            /*
-                               说明：
-                                 1：对于 WebSocket，他的数据是以 帧(frame) 形式传递
-                                 2：可以看到 WebSocketFrame 下面有6个子类，本次使用 TextWebSocketFrame
-                                 3：浏览器发送请求时 ws://localhost:9090/hello 表示请求URI
-                                 4：WebSocketServerProtocolHandler 核心功能，将 Http 协议升级为 WebSocket 协议， 保持长连接
-                                 5：通过一个状态码 101
-                             */
                             pipeline.addLast(new WebSocketServerProtocolHandler("/hello"));
 
-                            // 自定义 Handler 处理业务逻辑
                             pipeline.addLast(new MyTextWebSocketFrameHandler());
                         }
                     });
 
             ChannelFuture channelFuture = bootstrap.bind().sync();
-
             channelFuture.addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
-                    log.info("Server start Success ！");
+                    log.warn("服务端启动成功");
                 } else {
-                    log.error("服务启动失败");
+                    log.error("启动失败", future.cause());
                 }
             });
 
@@ -91,8 +79,41 @@ public class MyServer {
             bossGroup.shutdownGracefully().sync();
             workerGroup.shutdownGracefully().sync();
         }
+    }
+}
 
+@Slf4j
+class MyTextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
+    private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
+        log.warn("服务器接收到消息：{}", msg.text());
+        // 回复消息
+        ctx.channel().writeAndFlush(new TextWebSocketFrame("服务器时间：" + FORMAT.format(LocalDateTime.now()) + "：" + msg.text()));
     }
 
+
+    /**
+     * 当web客户端连接后，触发方法
+     */
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        // id：表示Channel唯一的值：LongText 是唯一的，ShortText 不是唯一
+        log.info("|-> handlerAdded() 被调用，[{}]", ctx.channel().id().asLongText());
+        log.info("|-> handlerAdded() 被调用，[{}]", ctx.channel().id().asShortText());
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        log.info("|-> handlerRemoved() 被调用，[{}]", ctx.channel().id().asLongText());
+        log.info("|-> handlerRemoved() 被调用，[{}]", ctx.channel().id().asShortText());
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("|-> 发生异常：{}， 关闭通道", cause.getMessage());
+        cause.printStackTrace();
+    }
 }
