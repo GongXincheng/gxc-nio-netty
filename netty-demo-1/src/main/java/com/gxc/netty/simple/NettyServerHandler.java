@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.CharsetUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * @author GongXincheng
  * @date 2019-12-22 20:46
  */
+@Slf4j
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private List<SocketChannel> clientChannelList;
@@ -33,7 +35,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("|-- Server ctx = " + ctx);
+        System.out.println("|-- Server ctx = " + ctx + "，ThreadName = " + Thread.currentThread().getName());
 
         // 任务队列
         // TODO：1：用户程序自定义的普通任务（将任务放入处理当前Channel事件的WorkerGroup线程组中之一的NioEventLoop的taskQueue中）
@@ -42,29 +44,30 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             try {
                 long sleepTime = 1000L;
                 Thread.sleep(sleepTime);
+                log.warn("I'm in eventLoop task， Thread->[{}]", Thread.currentThread().getName());
                 ctx.writeAndFlush(Unpooled.copiedBuffer("我睡醒了！[" + sleepTime + "]ms", CharsetUtil.UTF_8));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        //  TODO：2：用户自定义定时任务（该任务提交到 scheduleTaskQueue）
-        ctx.channel().eventLoop().schedule(() -> {
-            ctx.writeAndFlush(Unpooled.copiedBuffer("我是定时任务！", CharsetUtil.UTF_8));
-        }, 10, TimeUnit.SECONDS);
+//        //  TODO：2：用户自定义定时任务（该任务提交到 scheduleTaskQueue）
+//        ctx.channel().eventLoop().schedule(() -> {
+//            ctx.writeAndFlush(Unpooled.copiedBuffer("我是定时任务！", CharsetUtil.UTF_8));
+//        }, 10, TimeUnit.SECONDS);
 
 
-        //  TODO：3：非当前Reactor线程调用Channel的各种方法
-        for (SocketChannel socketChannel : clientChannelList) {
-            // 排除自身
-            if (socketChannel == ctx.channel()) {
-                continue;
-            }
-            socketChannel.eventLoop().execute(() -> {
-                String message = String.format("我是%s：%s", ctx.channel().remoteAddress(), "发送给其他Client通道");
-                socketChannel.writeAndFlush(Unpooled.copiedBuffer(message, CharsetUtil.UTF_8));
-            });
-        }
+//        //  TODO：3：非当前Reactor线程调用Channel的各种方法
+//        for (SocketChannel socketChannel : clientChannelList) {
+//            // 排除自身
+//            if (socketChannel == ctx.channel()) {
+//                continue;
+//            }
+//            socketChannel.eventLoop().execute(() -> {
+//                String message = String.format("我是%s：%s", ctx.channel().remoteAddress(), "发送给其他Client通道");
+//                socketChannel.writeAndFlush(Unpooled.copiedBuffer(message, CharsetUtil.UTF_8));
+//            });
+//        }
 
         // 将 msg 转成 ByteBuf( Netty 提供的, 不是 NIO 提供的 )
         ByteBuf buffer = (ByteBuf) msg;
