@@ -1,7 +1,9 @@
 package com.gxc.provider.user.config;
 
 import com.gxc.provider.user.netty.NettyServer;
+import com.gxc.provider.user.service.ProductServiceImpl;
 import com.gxc.provider.user.service.UserServiceImpl;
+import com.gxc.rpc.common.service.ProductService;
 import com.gxc.rpc.common.service.UserService;
 import com.gxc.spring.annotation.Bean;
 import com.gxc.spring.annotation.Configuration;
@@ -17,6 +19,11 @@ public class UserConfiguration implements ContainerRun {
     @Bean
     public UserService userServiceImpl() {
         return new UserServiceImpl();
+    }
+
+    @Bean
+    public ProductService productServiceImpl() {
+        return new ProductServiceImpl();
     }
 
     @Override

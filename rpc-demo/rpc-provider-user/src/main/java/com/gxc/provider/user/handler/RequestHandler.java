@@ -35,8 +35,8 @@ public class RequestHandler {
             Method method = implClass.getMethod(request.getMethodName(), request.getParameterTypes());
 
             Object invoke = method.invoke(serviceImpl, request.getParameters());
-            return RpcResponse.success(invoke);
 
+            return RpcResponse.success(invoke);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return RpcResponse.error(e.getMessage());

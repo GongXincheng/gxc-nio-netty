@@ -1,5 +1,6 @@
 package com.gxc.rpc.consumer.config;
 
+import com.gxc.rpc.consumer.controller.ProductController;
 import com.gxc.rpc.consumer.controller.UserController;
 import com.gxc.rpc.consumer.netty.NettyClient;
 import com.gxc.spring.annotation.Bean;
@@ -23,6 +24,12 @@ public class ConsumerConfiguration implements ContainerRun {
     public UserController userController() {
         return new UserController();
     }
+
+    @Bean
+    public ProductController productController() {
+        return new ProductController();
+    }
+
 
     @Override
     public void start() {
