@@ -23,6 +23,7 @@ public class MyMessageDecoder extends ReplayingDecoder<Void> {
         // 将得到的二进制字节码 转成 MessageProtocol 数据包(对象)
         int length = in.readInt();
 
+
         byte[] bytes = new byte[length];
         in.readBytes(bytes);
 
