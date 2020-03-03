@@ -7,6 +7,7 @@ import com.gxc.spring.context.AnnotationConfigApplicationContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author GongXincheng
@@ -14,7 +15,7 @@ import java.util.Objects;
  */
 public class ServiceRegistry {
 
-    private static final Map<String, Object> REGISTERED_SERVICES = new HashMap<>();
+    private static final Map<String, Object> REGISTERED_SERVICES = new ConcurrentHashMap<>(16);
 
     /**
      * 获取接口实现类
