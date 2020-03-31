@@ -101,20 +101,23 @@ public class AnnotationConfigApplicationContext implements ApplicationContext {
             log.info("|-- registry bean：{} success ! beanName: {}", bean.getClass().getSimpleName(), method.getName());
         }
 
-        // TODO：后处理Bean
-        BeanPostProcessor postProcessor = (BeanPostProcessor) BEAN_MAP.get(StringUtils.getBeanName(BeanPostProcessor.class));
-        if (Objects.nonNull(postProcessor)) {
-            this.postProcessorBean(postProcessor);
-        }
+        // 后处理bean.
+        this.postProcessorBean();
+
         log.info("|-------- all bean has registry success ! \n");
     }
 
     /**
      * 后处理bean.
-     *
-     * @param postProcessor BeanPostProcessor
      */
-    private void postProcessorBean(BeanPostProcessor postProcessor) throws Exception {
+    private void postProcessorBean() throws Exception {
+        // TODO：后处理Bean
+        BeanPostProcessor postProcessor = (BeanPostProcessor) BEAN_MAP.get(StringUtils.getBeanName(BeanPostProcessor.class));
+        if (Objects.isNull(postProcessor)) {
+            log.info("|-- don't have post processor bean");
+            return;
+        }
+
         for (Map.Entry<String, Object> entry : BEAN_MAP.entrySet()) {
             String beanName = entry.getKey();
             Object bean = entry.getValue();
