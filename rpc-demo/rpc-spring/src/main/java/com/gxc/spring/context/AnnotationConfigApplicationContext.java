@@ -2,11 +2,11 @@ package com.gxc.spring.context;
 
 import com.gxc.spring.annotation.Bean;
 import com.gxc.spring.annotation.Configuration;
+import com.gxc.spring.annotation.Resource;
 import com.gxc.spring.lifecycle.BeanPostProcessor;
 import com.gxc.spring.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
